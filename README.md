@@ -1,7 +1,10 @@
 # Title: Single-cell mapping of alternative splicing uncovers hepatocyte-specific signatures driving  tumorigenesis and chemoresistance in HCC
 Alternative splicing (AS) is a major source of transcriptomic diversity and has been increasingly implicated in cancer progression, including hepatocellular carcinoma (HCC). However, accurately comparing AS variation within defined cell types at single-cell resolution remains challenging due to limited transcript coverage and data sparsity. Here, we applied scFAST-seq, a full-length single-cell transcriptome platform, combined with cell-type-specific pseudo-bulk binning and a similarity-based imputation strategy, to systematically characterize AS landscapes in HCC.
 
-We provide an overview of the associated analysis workflow, which includes the construction of AS profiles from bulk RNA-seq data (PSI matrices), as well as AS profiling from scFAST-seq data. The single-cell AS analysis workflow involves the following steps:
+We provide an overview of the associated analysis workflow, which includes the construction of AS profiles from bulk RNA-seq data (PSI matrices), as well as AS profiling from scFAST-seq data. 
+
+The single-cell AS analysis workflow involves the following steps:
+
 1，Cell type annotation based on gene expression profiles – Assigning each single cell to a defined cell type using transcriptomic signatures. step0_scFAST_generate_metadata.R
 
 2，Splitting BAM files by cell identity – Dividing raw single-cell BAM files according to annotated cell types. step1_scFAST_prepare_cell_bam.sh
