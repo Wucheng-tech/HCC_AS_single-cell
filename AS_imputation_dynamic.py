@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 # ======================
 #source activate scasl
 #python AS_imputation_dynamic.py  workdir --k 3 --threads 100
-# 参数解析
+# Argument parser
 # ======================
 parser = argparse.ArgumentParser(
     description="Dynamic KNN imputation for AS matrix (multithread)"
@@ -36,7 +36,7 @@ k = args.k
 max_workers = args.threads
 
 # ======================
-# 路径定义
+# Define input/output paths
 # ======================
 as_file = os.path.join(workdir, "AS_abs.csv")
 dm_file = os.path.join(workdir, "Gene_matrix.csv")
@@ -46,13 +46,13 @@ out_file = os.path.join(
 )
 
 # ======================
-# 读入数据
+# Load input matrices
 # ======================
 df = pd.read_csv(as_file, index_col=0)
 dm = pd.read_csv(dm_file, index_col=0)
 
 # ======================
-# 函数定义
+# Helper functions
 # ======================
 def fill_na(df):
     return df.fillna(0.5)
@@ -62,7 +62,7 @@ def knn_impute_dynamic_multithread(df_fillna, dm, df, k=3, max_workers=100):
     m = array_dm.shape[0]
     n = df.shape[0]
 
-    # 1. 距离矩阵
+    # Step 1: Compute pairwise cell distance matrix
     d = np.zeros((m, m))
     for i in trange(m - 1, desc="Computing distance matrix"):
         for j in range(i, m):
@@ -70,13 +70,13 @@ def knn_impute_dynamic_multithread(df_fillna, dm, df, k=3, max_workers=100):
                 np.sum((array_dm[i] - array_dm[j]) ** 2)
             )
 
-    # 2. 邻居排序
+    # Step 2: Pre-sort neighbors for each cell
     all_neighbors = np.argsort(d, axis=1)
     dist_std = d.std() + 1e-8
 
     df_values = df.values
     df_fillna_values = df_fillna.values
-
+    # Step 3: Impute PSI for a single cell
     def impute_for_cell(i):
         col_res = df_values[:, i].copy()
 
@@ -108,7 +108,7 @@ def knn_impute_dynamic_multithread(df_fillna, dm, df, k=3, max_workers=100):
 
         return col_res
 
-    # 3. 多线程
+    # Step 4: Parallel imputation across cells
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         results = list(
             tqdm(
@@ -127,7 +127,7 @@ def knn_impute_dynamic_multithread(df_fillna, dm, df, k=3, max_workers=100):
     return df_knn
 
 # ======================
-# 运行
+# Run imputation
 # ======================
 df_fillna = fill_na(df)
 df_knn_imputed = knn_impute_dynamic_multithread(
